@@ -1,0 +1,30 @@
+﻿Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.5.2.0
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BlazorApiApp", "BlazorApiApp.csproj", "{A2988574-0232-BBE9-7F17-5A09F1D788C9}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BlazorApiApp.Tests", "..\BlazorApiApp.Tests\BlazorApiApp.Tests.csproj", "{49C6B85F-4D13-4D97-A24E-2A74B22CCEF3}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{A2988574-0232-BBE9-7F17-5A09F1D788C9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A2988574-0232-BBE9-7F17-5A09F1D788C9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A2988574-0232-BBE9-7F17-5A09F1D788C9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A2988574-0232-BBE9-7F17-5A09F1D788C9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{49C6B85F-4D13-4D97-A24E-2A74B22CCEF3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{49C6B85F-4D13-4D97-A24E-2A74B22CCEF3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{49C6B85F-4D13-4D97-A24E-2A74B22CCEF3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{49C6B85F-4D13-4D97-A24E-2A74B22CCEF3}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {60768475-C13F-4DB0-B373-AFE3206A2234}
+	EndGlobalSection
+EndGlobal

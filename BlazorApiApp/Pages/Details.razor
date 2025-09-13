@@ -1,0 +1,116 @@
+@page "/details/{id:int}"
+@using System.Net.Http.Json
+@using Microsoft.AspNetCore.Components
+@using BlazorApiApp.Models
+@using BlazorApiApp.Services
+
+@inject HttpClient Http
+@inject FavoritesService FavoritesService
+
+<PageTitle>Details</PageTitle>
+
+@if (card == null)
+{
+    <p>Loading card...</p>
+}
+else
+{
+    <div class="details-container">
+        <div class="details-card">
+            <h2>@card.name</h2>
+            <img src="@card.card_images.FirstOrDefault()?.image_url" alt="@card.name" />
+            <p><strong>Type:</strong> @card.type</p>
+            <p>@card.desc</p>
+
+            <!-- Navigation -->
+            <div class="nav-buttons">
+                <button @onclick="PreviousCardAsync">Previous</button>
+                <button @onclick="NextCardAsync">Next</button>
+            </div>
+
+            <!-- Favori (centré sous les boutons) -->
+            <div class="favorite-icon" @onclick="ToggleFavoriteAsync">
+                @if (isFavorite)
+                {
+                    <span class="star active">★</span>
+                }
+                else
+                {
+                    <span class="star">☆</span>
+                }
+            </div>
+        </div>
+    </div>
+}
+
+@code {
+    [Parameter] public int id { get; set; }
+
+    private Card? card;
+    private List<Card> allCards = new();
+    private int currentIndex;
+    private bool isFavorite = false;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var result = await Http.GetFromJsonAsync<ApiResponse>(
+            "https://db.ygoprodeck.com/api/v7/cardinfo.php"
+        );
+
+        if (result != null && result.data.Any())
+        {
+            allCards = result.data;
+            currentIndex = allCards.FindIndex(c => c.id == id);
+
+            if (currentIndex >= 0)
+            {
+                card = allCards[currentIndex];
+                await UpdateFavoriteStatusAsync();
+            }
+        }
+    }
+
+    private async Task NextCardAsync()
+    {
+        if (currentIndex < allCards.Count - 1)
+        {
+            currentIndex++;
+            card = allCards[currentIndex];
+            await UpdateFavoriteStatusAsync();
+        }
+    }
+
+    private async Task PreviousCardAsync()
+    {
+        if (currentIndex > 0)
+        {
+            currentIndex--;
+            card = allCards[currentIndex];
+            await UpdateFavoriteStatusAsync();
+        }
+    }
+
+    private async Task ToggleFavoriteAsync()
+    {
+        if (card == null) return;
+
+        if (isFavorite)
+        {
+            await FavoritesService.RemoveFavorite(card.id);
+            isFavorite = false;
+        }
+        else
+        {
+            await FavoritesService.AddFavorite(card);
+            isFavorite = true;
+        }
+    }
+
+    private async Task UpdateFavoriteStatusAsync()
+    {
+        if (card != null)
+        {
+            isFavorite = await FavoritesService.IsFavorite(card.id);
+        }
+    }
+}

@@ -1,0 +1,45 @@
+@page "/favorites"
+@using BlazorApiApp.Models
+@using BlazorApiApp.Services
+@using System.Linq
+
+@inject FavoritesService FavoritesService
+
+<PageTitle>Favorites</PageTitle>
+
+<h3>My Favorite Cards</h3>
+
+@if (!favorites.Any())
+{
+    <p>No favorites yet.</p>
+}
+else
+{
+    <div class="favorites-container">
+        @foreach (var c in favorites)
+        {
+            <div class="favorite-card">
+                <img src="@c.card_images.FirstOrDefault()?.image_url" alt="@c.name" />
+                <div class="fav-info">
+                    <strong>@c.name</strong>
+                    <button @onclick="() => RemoveAsync(c.id)">Remove</button>
+                </div>
+            </div>
+        }
+    </div>
+}
+
+@code {
+    private List<Card> favorites = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        favorites = await FavoritesService.GetFavorites();
+    }
+
+    private async Task RemoveAsync(int id)
+    {
+        await FavoritesService.RemoveFavorite(id);
+        favorites = await FavoritesService.GetFavorites();
+    }
+}

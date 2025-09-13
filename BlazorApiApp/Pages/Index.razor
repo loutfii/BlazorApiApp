@@ -1,0 +1,120 @@
+﻿@page "/"
+@using System.Net.Http.Json
+@using System.Linq
+@using BlazorApiApp.Models
+@using BlazorApiApp.Services
+@inject NavigationManager NavigationManager
+@inject HttpClient Http
+@inject FavoritesService FavoritesService
+
+<PageTitle>Yu-Gi-Oh Home</PageTitle>
+
+<h3>Yu-Gi-Oh! Cards</h3>
+
+@if (cards == null || !cards.Any() || selectedCard == null)  
+{
+    <p>Loading cards...</p> 
+}
+else
+{
+    <div class="home-container">
+        
+        <!-- Liste des miniatures à gauche -->
+        <div class="thumbnail-list">
+            @foreach (var card in cards.Take(10)) 
+            {
+                <div class="thumbnail">
+                    <img src="@card.card_images.FirstOrDefault()?.image_url"
+                         alt="@card.name"
+                         @onclick="() => SelectCardAsync(card)" />
+
+                    <p class="card-link" @onclick="() => GoToDetails(card.id)">
+                        @card.name
+                    </p>
+                </div>
+            }
+        </div>
+
+        <!-- Grande carte centrée -->
+        <div class="main-card"> 
+            <!-- Étoile favoris -->
+            <div class="favorite-icon" @onclick="ToggleFavoriteAsync">
+                @if (isFavorite)
+                {
+                    <span class="star active">★</span>
+                }
+                else
+                {
+                    <span class="star">☆</span>
+                }
+            </div>
+
+            <h4>@selectedCard.name</h4>
+
+            <!-- Image cliquable vers détails -->
+            <img src="@selectedCard.card_images.FirstOrDefault()?.image_url"
+                 alt="@selectedCard.name"
+                 class="clickable-image"
+                 @onclick="() => GoToDetails(selectedCard.id)" />
+
+            <p>@selectedCard.type</p>
+        </div>
+    </div>
+}
+
+@code {
+    private List<Card> cards = new();
+    private Card selectedCard = new();
+    private bool isFavorite = false;
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            var result = await Http.GetFromJsonAsync<ApiResponse>(
+                "https://db.ygoprodeck.com/api/v7/cardinfo.php"
+            );
+
+            if (result != null && result.data.Any())
+            {
+                cards = result.data;
+                selectedCard = cards.First(); 
+                await UpdateFavoriteStatusAsync();
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Erreur API: {ex.Message}");
+        }
+    }
+
+    private async Task SelectCardAsync(Card card)
+    {
+        selectedCard = card;
+        await UpdateFavoriteStatusAsync();
+    }
+
+    private void GoToDetails(int id)
+    {
+        NavigationManager.NavigateTo($"/details/{id}");
+    }
+
+    private async Task ToggleFavoriteAsync()
+    {
+        if (isFavorite)
+        {
+            await FavoritesService.RemoveFavorite(selectedCard.id);
+            isFavorite = false;
+        }
+        else
+        {
+            await FavoritesService.AddFavorite(selectedCard);
+            isFavorite = true;
+        }
+    }
+
+    private async Task UpdateFavoriteStatusAsync()
+    {
+        isFavorite = await FavoritesService.IsFavorite(selectedCard.id);
+    }
+}
